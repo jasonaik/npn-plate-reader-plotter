@@ -1,0 +1,243 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import ttest_ind
+import datetime
+import os
+
+plt.rcParams.update({
+    "font.family": "sans-serif",
+    "font.sans-serif": ["Arial"],  
+    "font.size": 10,                   
+    "axes.labelsize": 12,
+    "axes.titlesize": 12,
+    "xtick.labelsize": 10,
+    "ytick.labelsize": 10,
+})
+
+def p_to_star(p):
+    if p < 0.0001:
+        return "****"
+    if p < 0.001:
+        return "***"
+    if p < 0.01:
+        return "**"
+    if p < 0.05:
+        return "*"
+    return "ns"
+
+# construct_names=[
+#             "Empty Vector Control", 
+#             "Pore Only Control",
+#             "ICR211+192",
+#             "ICR212+192",
+#             "ICR213+192",
+#             "ICR214+192",
+#             "ICR215+192",
+#             "ICR216+192",
+#             "ICR235+196",
+#             "ICR236+196",
+#             "ICR237+196",
+#             "ICR238+196",
+#             "ICR239+196",
+#             "ICR240+196",
+#         ]
+
+construct_names = [
+    "Empty Vector Control", 
+    "Pore Only Control",
+    "ICR183+189",
+    # "ICR187+190",
+]
+
+filename = "blue-light-10mM"
+
+df = pd.read_csv(f"data/{filename}.csv")
+
+# Ensure consistent construct order
+df["construct"] = pd.Categorical(
+    df["construct"],
+    categories=construct_names,
+    ordered=True
+)
+
+# ---- Custom colours ----
+colors = {
+    "dark":  "#bfbfbf",
+    "light": "#d86ecc",
+}
+
+def plot_metric(ax, metric_name, title):
+    summary = (
+        df.groupby(["construct", "plate"], observed=True)[metric_name]
+          .agg(mean="mean", sd="std")
+          .reset_index()
+    )
+
+    mean_p = summary.pivot(index="construct", columns="plate", values="mean")
+    sd_p   = summary.pivot(index="construct", columns="plate", values="sd")
+
+    present = [c for c in construct_names if c in mean_p.index]
+    mean_p = mean_p.reindex(present)
+    sd_p   = sd_p.reindex(present)
+
+    constructs = mean_p.index.tolist()
+    x = np.arange(len(constructs))
+    width = 0.36
+
+    # ---- Bars + replicate points ----
+    for plate in ["dark", "light"]:
+        if plate not in mean_p.columns:
+            continue
+
+        xpos = x + (-width/2 if plate == "dark" else width/2)
+
+        ax.bar(
+            xpos,
+            mean_p[plate].values,
+            width,
+            yerr=sd_p[plate].values,
+            capsize=3,
+            label=plate,
+            color=colors[plate],
+            edgecolor="black",
+            linewidth=0.7,
+            alpha=0.6,
+            error_kw={"elinewidth": 0.7, "capthick": 0.7},
+        )
+
+        rng = np.random.default_rng(0)
+        jitter_scale = 0.05
+
+        for idx, c in enumerate(constructs):
+            sub = df[(df["plate"] == plate) & (df["construct"] == c)][metric_name].dropna().values
+            if len(sub) == 0:
+                continue
+
+            base_x = idx + (-width/2 if plate == "dark" else width/2)
+            jitter = rng.normal(0, jitter_scale, size=len(sub))
+
+            ax.scatter(
+                np.full_like(sub, base_x, dtype=float) + jitter,
+                sub,
+                s=25,
+                color=colors[plate],
+                edgecolor="black",
+                linewidth=0.5,
+                zorder=3,
+            )
+
+    # ---- Significance (dark vs light per construct) ----
+    have_both = ("dark" in mean_p.columns) and ("light" in mean_p.columns)
+    if have_both:
+        # Top baseline for brackets (similar to your global_star_y idea)
+        # Use mean+sd; ignore NaNs safely.
+        global_star_y = np.nanmax((mean_p + sd_p).to_numpy()) * 1.15
+
+        for gi, c in enumerate(constructs):
+            vals_dark = df[(df["plate"] == "dark") & (df["construct"] == c)][metric_name].dropna().values
+            vals_light = df[(df["plate"] == "light") & (df["construct"] == c)][metric_name].dropna().values
+
+            # Need both groups and at least 2 total points to test; you can tighten this if you want
+            if len(vals_dark) == 0 or len(vals_light) == 0:
+                continue
+
+            stat, p = ttest_ind(vals_dark, vals_light, equal_var=False)  # Welch's t-test
+            stars = p_to_star(p)
+            if stars == "ns":
+                continue
+
+            # x positions for the bracket
+            x_center = x[gi]
+            x1 = x_center - width / 2
+            x2 = x_center + width / 2
+
+            y = global_star_y
+
+            # bracket
+            ax.plot([x1, x1, x2, x2],
+                    [y * 0.98, y, y, y * 0.98],
+                    lw=1, c="black")
+
+            # stars
+            ax.text((x1 + x2) / 2, y * 1.02, stars,
+                    ha="center", va="bottom", fontsize=11)
+
+        ax.set_ylim(top=global_star_y * 1.15)
+
+    # ---- Labels ----
+    ax.set_xticks(x)
+    ax.set_xticklabels(constructs, rotation=45, ha="right")
+    ax.set_ylabel(metric_name)
+    ax.set_title(title)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.yaxis.grid(True, linestyle="-", linewidth=0.8, alpha=0.4)
+    ax.set_axisbelow(True)
+
+
+# ---- Plot 1: 450 nm ----
+fig1, ax1 = plt.subplots(
+    figsize=(max(10, len(construct_names)*0.6), 5)
+)
+
+plot_metric(
+    ax1,
+    "normalized_fluo",
+    "Dark vs Light (450nm Normalized Fluorescence)"
+)
+
+ax1.legend(frameon=False, fontsize=12, loc="center left", bbox_to_anchor=(1, 0.5))
+ax1.set_ylabel("Normalized Fluorescence (450nm)")
+plt.tight_layout()
+plt.show()
+
+date = datetime.date.today()
+
+os.makedirs(f"plots/pdf/{date}", exist_ok=True)
+os.makedirs(f"plots/svg/{date}", exist_ok=True)
+
+fig1.savefig(
+        f"plots/pdf/{date}/450-{filename}.pdf",
+        bbox_inches="tight",   # trims white space
+        dpi=300,               # for raster elements (still vector overall)
+        transparent=True       # if you want transparent background
+    )
+
+fig1.savefig(
+        f"plots/svg/{date}/450-{filename}.svg",
+        bbox_inches="tight",   # trims white space
+        dpi=300,               # for raster elements (still vector overall)
+        transparent=True       # if you want transparent background
+    )
+
+
+# # ---- Plot 2: 405 nm ----
+# fig2, ax2 = plt.subplots(
+#     figsize=(max(10, len(construct_names)*0.6), 5)
+# )
+
+# plot_metric(
+#     ax2,
+#     "normalized_fluo_405",
+#     "Dark vs Light (405nm Normalized Fluorescence)"
+# )
+
+# ax2.legend(frameon=False)
+# plt.tight_layout()
+# plt.show()
+
+# fig2.savefig(
+#         f"plots/pdf/{date}/405-{filename}.pdf",
+#         bbox_inches="tight",   # trims white space
+#         dpi=300,               # for raster elements (still vector overall)
+#         transparent=True       # if you want transparent background
+#     )
+
+# fig2.savefig(
+#         f"plots/svg/{date}/405-{filename}.svg",
+#         bbox_inches="tight",   # trims white space
+#         dpi=300,               # for raster elements (still vector overall)
+#         transparent=True       # if you want transparent background
+#     )
+
