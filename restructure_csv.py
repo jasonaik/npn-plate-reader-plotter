@@ -149,14 +149,14 @@ def build_plate_long_with_raw(path: str, plate_name: str, row_map: dict, constru
     return out
     
 if __name__ == "__main__":
-    # Example usage
-    light_path = "raw-data/27-02-light.csv"
     
     row_map={
             "A": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
             "B": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
             "C": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
             "D": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
+            "E": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
+            "F": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
         }
       
     # construct_names=[
@@ -165,25 +165,57 @@ if __name__ == "__main__":
     #         "ICR183+189",
     #         "ICR187+190",
     #     ]  
-    construct_names=[
-            "Empty Vector Control", 
-            "Pore Only Control",
-            "ICR211+192",
-            "ICR212+192",
-            "ICR213+192",
-            "ICR214+192",
-            "ICR215+192",
-            "ICR216+192",
-            "ICR235+196",
-            "ICR236+196",
-            "ICR237+196",
-            "ICR238+196",
-            "ICR239+196",
-            "ICR240+196",
-        ]
+    # construct_names=[
+    #         "Empty Vector Control", 
+    #         "Pore Only Control",
+    #         "ICR211+192",
+    #         "ICR212+192",
+    #         "ICR213+192",
+    #         "ICR214+192",
+    #         "ICR215+192",
+    #         "ICR216+192",
+    #         "ICR235+196",
+    #         "ICR236+196",
+    #         "ICR237+196",
+    #         "ICR238+196",
+    #         "ICR239+196",
+    #         "ICR240+196",
+    #     ]
     
-    light_long = build_plate_long_with_raw(light_path, "light", row_map, construct_names, num_reps=3)
-    dark_long = build_plate_long_with_raw("raw-data/27-02-dark.csv", "dark", row_map, construct_names, num_reps=3)
+    construct_names = [
+    "Empty Vector Control",
+    "Pore Only Control",
+    "ICR217+193",
+    "ICR218+193",
+    "ICR219+193",
+    "ICR220+193",
+    "ICR221+193",
+    "ICR222+193",
+    "ICR223+194",
+    "ICR224+194",
+    "ICR225+194",
+    "ICR226+194",
+    "ICR227+194",
+    "ICR228+194",
+    "ICR229+195",
+    "ICR230+195",
+    "ICR231+195",
+    "ICR232+195",
+    "ICR233+195",
+    "ICR234+195",
+    "ICR215",
+    "ICR216",
+    "ICR239",
+    "ICR240",
+]
+    
+    
+    light_path = "light-05-03.csv"
+    dark_path = "dark-05-03.csv"
+    output_filename = "05-03-ICR193-195-196"
+    
+    light_long = build_plate_long_with_raw(f"raw-data/{light_path}", "light", row_map, construct_names, num_reps=3)
+    dark_long = build_plate_long_with_raw(f"raw-data/{dark_path}", "dark", row_map, construct_names, num_reps=3)
     
     combined = pd.concat([dark_long, light_long], ignore_index=True)
-    combined.to_csv(f"{light_path}-restructured.csv", index=False)
+    combined.to_csv(f"data/{output_filename}.csv", index=False)

@@ -44,13 +44,33 @@ def p_to_star(p):
 #         ]
 
 construct_names = [
-    "Empty Vector Control", 
+    "Empty Vector Control",
     "Pore Only Control",
-    "ICR183+189",
-    # "ICR187+190",
+    "ICR217+193",
+    "ICR218+193",
+    "ICR219+193",
+    "ICR220+193",
+    "ICR221+193",
+    "ICR222+193",
+    "ICR223+194",
+    "ICR224+194",
+    "ICR225+194",
+    "ICR226+194",
+    "ICR227+194",
+    "ICR228+194",
+    "ICR229+195",
+    "ICR230+195",
+    "ICR231+195",
+    "ICR232+195",
+    "ICR233+195",
+    "ICR234+195",
+    "ICR215",
+    "ICR216",
+    "ICR239",
+    "ICR240",
 ]
 
-filename = "blue-light-10mM"
+filename = "05-03-ICR193-195-196-no-out"
 
 df = pd.read_csv(f"data/{filename}.csv")
 
@@ -183,7 +203,7 @@ fig1, ax1 = plt.subplots(
 
 plot_metric(
     ax1,
-    "normalized_fluo",
+    "normalized_fluo_450",
     "Dark vs Light (450nm Normalized Fluorescence)"
 )
 
