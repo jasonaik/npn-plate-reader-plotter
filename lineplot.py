@@ -17,11 +17,14 @@ colors = {
     10: "#0072B2",
 }
 
-filename = "violet-light-dark-only"
+filename = "violet-light-dark-only-no-out"
 
 df = pd.read_csv(f"data/{filename}.csv")
 
 for name in construct_names:
+    
+    fig, ax = plt.subplots(
+        figsize=(10, 5))
     
     # raw data (for actual points)
     raw_subset = df[df["construct"] == name]
@@ -72,9 +75,17 @@ for name in construct_names:
 
     os.makedirs(f"plots/pdf/{date}", exist_ok=True)
     os.makedirs(f"plots/svg/{date}", exist_ok=True)
+    
 
-    plt.savefig(
-            f"plots/pdf/{date}/450-{filename}.pdf",
+    fig.savefig(
+            f"plots/pdf/{date}/450-{filename}-{name}.pdf",
+            bbox_inches="tight",   # trims white space
+            dpi=300,               # for raster elements (still vector overall)
+            transparent=True       # if you want transparent background
+        )
+    
+    fig.savefig(
+            f"plots/svg/{date}/450-{filename}-{name}.svg",
             bbox_inches="tight",   # trims white space
             dpi=300,               # for raster elements (still vector overall)
             transparent=True       # if you want transparent background

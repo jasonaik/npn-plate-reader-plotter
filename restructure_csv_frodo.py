@@ -8,7 +8,8 @@ def extract_raw_blocks(path: str):
     Does NOT rely on specific column names.
     """
 
-    df = pd.read_csv(path, skiprows=2)
+    # df = pd.read_csv(path, skiprows=2)
+    df = pd.read_csv(path, skiprows=7)
 
     # Always treat first column by position
     first_col = df.iloc[:, 0]
@@ -151,12 +152,14 @@ def build_plate_long_with_raw(path: str, plate_name: str, row_map: dict, constru
 if __name__ == "__main__":
     
     row_map={
-            "A": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
-            "B": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
-            "C": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
-            "D": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
-            "E": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
-            "F": {"npn_mM": 10, "time_label": 15, "time_s": 15*60},
+            "A": {"npn_mM": 0.03125, "time_label": 15, "time_s": 15*60},
+            "B": {"npn_mM": 0.03125, "time_label": 15, "time_s": 15*60},
+            "C": {"npn_mM": 0.03125, "time_label": 15, "time_s": 15*60},
+            "D": {"npn_mM": 0.03125, "time_label": 15, "time_s": 15*60},
+            "E": {"npn_mM": 0.03125, "time_label": 15, "time_s": 15*60},
+            "F": {"npn_mM": 0.03125, "time_label": 15, "time_s": 15*60},
+            "G": {"npn_mM": 0.03125, "time_label": 15, "time_s": 15*60},
+            "H": {"npn_mM": 0.03125, "time_label": 15, "time_s": 15*60},
         }
       
     # construct_names=[
@@ -165,54 +168,97 @@ if __name__ == "__main__":
     #         "ICR183+189",
     #         "ICR187+190",
     #     ]  
-    # construct_names=[
-    #         "Empty Vector Control", 
-    #         "Pore Only Control",
-    #         "ICR211+192",
-    #         "ICR212+192",
-    #         "ICR213+192",
-    #         "ICR214+192",
-    #         "ICR215+192",
-    #         "ICR216+192",
-    #         "ICR235+196",
-    #         "ICR236+196",
-    #         "ICR237+196",
-    #         "ICR238+196",
-    #         "ICR239+196",
-    #         "ICR240+196",
-    #     ]
+    construct_names=[
+            "Empty Vector Control", 
+            "Pore Only Control",
+            "ICR211+192",
+            "ICR212+192",
+            "ICR213+192",
+            "ICR214+192",
+            "ICR215+192",
+            "ICR216+192",   
+            "ICR235+196",
+            "ICR236+196",
+            "ICR237+196",
+            "ICR238+196",
+            "ICR239+196",
+            "ICR240+196",
+        ]
     
-    construct_names = [
-    "Empty Vector Control",
-    "Pore Only Control",
-    "ICR217+193",
-    "ICR218+193",
-    "ICR219+193",
-    "ICR220+193",
-    "ICR221+193",
-    "ICR222+193",
-    "ICR223+194",
-    "ICR224+194",
-    "ICR225+194",
-    "ICR226+194",
-    "ICR227+194",
-    "ICR228+194",
-    "ICR229+195",
-    "ICR230+195",
-    "ICR231+195",
-    "ICR232+195",
-    "ICR233+195",
-    "ICR234+195",
-    "ICR215",
-    "ICR216",
-    "ICR239",
-    "ICR240",
-]
+    # construct_names = [
+    #     "Empty Vector Control",
+    #     "Empty Vector Control",
+    #     "Empty Vector Control",
+    #     "Empty Vector Control",
+    #     "Empty Vector Control",
+    #     "Empty Vector Control",
+    #     "Empty Vector Control",
+    #     "Empty Vector Control",
+    #     "Pore Only Control",
+    #     "Pore Only Control",
+    #     "Pore Only Control",
+    #     "Pore Only Control",
+    #     "Pore Only Control",
+    #     "Pore Only Control",      
+    #     "Pore Only Control",
+    #     "Pore Only Control",
+    #     "Pore Only Control",
+    #     "Pore Only Control",
+    #     "Pore Only Control",
+    #     "Pore Only Control",           
+    #     "ICR229+195",
+    #     "ICR229+195",
+    #     "ICR229+195",
+    #     "ICR229+195",
+    #     "ICR229+195",
+    #     "ICR229+195",
+    #     "ICR229+195",
+    #     "ICR229+195",
+    #     "ICR229+195",
+    #     "ICR229+195",
+    #     "ICR229+195",
+    #     "ICR229+195",
+    # ]
+    
+    # construct_names = [
+    # "Empty Vector Control",
+    # "Pore Only Control",
+    # "ICR183+190",
+    # "ICR184+190",
+    # "ICR185+190",
+    # "ICR186+190",
+    # "ICR187+190",
+    # "ICR188+190",
+    # "ICR183+198",
+    # "ICR184+198",
+    # "ICR185+198",
+    # "ICR186+198",
+    # "ICR187+198",
+    # "ICR188+198",
+    # "ICR205+191",
+    # "ICR206+191",
+    # "ICR207+191",
+    # "ICR208+191",
+    # "ICR209+191",
+    # "ICR210+191",
+    # "ICR205+199",
+    # "ICR206+199",
+    # "ICR207+199",
+    # "ICR208+199",
+    # "ICR209+199",
+    # "ICR210+199",
+    # "ICR229+195",
+    # "ICR230+195",
+    # "ICR231+195",
+    # "ICR232+195",
+    # "ICR233+195",
+    # "ICR234+195"
+    # ]
     
     
-    light_path = "light-05-03.csv"
-    dark_path = "dark-05-03.csv"
-    output_filename = "05-03-ICR193-195-196"
+    light_path = "26-04-05-series-repeat-light.csv"
+    dark_path = "26-04-05-series-repeat-dark.csv"
+    output_filename = "26-04-05-series-repeat-restructured"
     
     light_long = build_plate_long_with_raw(f"raw-data/{light_path}", "light", row_map, construct_names, num_reps=3)
     dark_long = build_plate_long_with_raw(f"raw-data/{dark_path}", "dark", row_map, construct_names, num_reps=3)

@@ -26,51 +26,26 @@ def p_to_star(p):
         return "*"
     return "ns"
 
-# construct_names=[
-#             "Empty Vector Control", 
-#             "Pore Only Control",
-#             "ICR211+192",
-#             "ICR212+192",
-#             "ICR213+192",
-#             "ICR214+192",
-#             "ICR215+192",
-#             "ICR216+192",
-#             "ICR235+196",
-#             "ICR236+196",
-#             "ICR237+196",
-#             "ICR238+196",
-#             "ICR239+196",
-#             "ICR240+196",
-#         ]
-
 construct_names = [
     "Empty Vector Control",
     "Pore Only Control",
-    "ICR217+193",
-    "ICR218+193",
-    "ICR219+193",
-    "ICR220+193",
-    "ICR221+193",
-    "ICR222+193",
-    "ICR223+194",
-    "ICR224+194",
-    "ICR225+194",
-    "ICR226+194",
-    "ICR227+194",
-    "ICR228+194",
-    "ICR229+195",
-    "ICR230+195",
-    "ICR231+195",
-    "ICR232+195",
-    "ICR233+195",
-    "ICR234+195",
-    "ICR215",
-    "ICR216",
-    "ICR239",
-    "ICR240",
+    # "ICR229+195",
+    # "ICR229+195",
+    # "ICR183+190",
+    # "ICR184+190",
+    # "ICR185+190",
+    # "ICR186+190",
+    # "ICR187+190",
+    # "ICR188+190",
+    # "ICR205+191",
+    # "ICR206+191",
+    # "ICR207+191",
+    # "ICR208+191",
+    # "ICR209+191",
+    # "ICR210+191",
 ]
 
-filename = "05-03-ICR193-195-196-no-out"
+filename = "ICR191-only"
 
 df = pd.read_csv(f"data/{filename}.csv")
 
