@@ -48,10 +48,11 @@ df = pd.read_csv(f"data/{filename}.csv")
 
 # ---- Custom colours ----
 colors = {
-    "blue_dark":  "#0800ff",
-    "blue_light": "#6cf0fa",
-    "violet_dark": "#6c008a",
-    "violet_light": "#CB83FF",
+    "blue_dark":  "#bfbfbf",
+    "blue_light": "#d86ecc",
+    "violet_dark": "#5a5a5a",
+    "violet_light": "#FF00E1",
+    
 }
 
 def plot_metric(ax, metric_name, title):
@@ -75,10 +76,10 @@ def plot_metric(ax, metric_name, title):
     plate_order = ["blue_dark", "blue_light", "violet_dark", "violet_light"]
     
     offsets = {
-            "blue_dark":   -1.5 * width,
-            "blue_light":  -0.5 * width,
-            "violet_dark":  0.5 * width,
-            "violet_light": 1.5 * width,
+            "blue_dark":   -1.7 * width,
+            "blue_light":  -0.7 * width,
+            "violet_dark":  0.7 * width,
+            "violet_light": 1.7 * width,
         }
     
     for plate in plate_order:

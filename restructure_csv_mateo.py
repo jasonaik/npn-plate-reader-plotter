@@ -22,7 +22,7 @@ def restructure_csv_2(filename, construct_names, concs, reps_per_construct, plat
     df = pd.read_csv(filename, skiprows=5)
     
     # 2. Keep only the OD600 column
-    df_od = df[["Raw Data (600 1)"]]
+    df_od = df[["Raw Data (600 1)", "Well"]]
 
     # 3. Rename the column
     df_od = df_od.rename(columns={"Raw Data (600 1)": "od600"})
@@ -30,7 +30,24 @@ def restructure_csv_2(filename, construct_names, concs, reps_per_construct, plat
     df_od["construct"] = [name for name in construct_names for _ in range(reps_per_construct)]
 
     # If you are doing multiple conc series, omit if you are doing just one conc 
-    df_od["conc"] = concs * 8
+    df_od["conc"] = concs * len(construct_names)
+    
+    df_od["plate"] = plate
+
+    return df_od
+
+def restructure_csv_3(filename, construct_names, concs, reps_per_construct, plate):
+    # 1. Load the file (skip metadata rows at the top)
+    df = pd.read_csv(filename, skiprows=5)
+    
+    # 2. Keep only the OD600 column
+    df_od = df[["Raw Data (600 1)", "Well"]]
+
+    # 3. Rename the column
+    df_od = df_od.rename(columns={"Raw Data (600 1)": "od600"})
+        
+    df_od["construct"] = construct_names * len(concs)
+    df_od["conc"] = [conc for conc in concs for _ in range(len(construct_names))]
     
     df_od["plate"] = plate
 
@@ -54,38 +71,55 @@ if __name__ == "__main__":
         "Empty Vector Control",
         "Pore Only Control",
         "Pore Only Control",
-        "Pore Only Control",
         "ICR229+195",
         "ICR229+195",
-        "ICR229+195",
+        "ICR213+192",
+        "ICR213+192",
+        "Nterminal Control",
+        "Nterminal Control",
+        "IL6 Control",
+        "IL6 Control",
     ]
     
 
+    # concs = [
+    #     "1",
+    #     "1/2",
+    #     "1/4",
+    #     "1/8",
+    #     "1/16",
+    #     "1/32",
+    #     "1/64",
+    #     "1/128",
+    #     "1/256",
+    #     "1/512",
+    #     "1/1024",
+    #     "0",
+    # ]
+    
     concs = [
-        "1",
-        "1/2",
         "1/4",
         "1/8",
+        "1/12",
         "1/16",
+        "1/24",
         "1/32",
+        "1/48",
         "1/64",
-        "1/128",
-        "1/256",
-        "1/512",
-        "1/1024",
-        "0",
     ]
     
-    dark_filename = "raw-data/26-04-10-dark.CSV"
-    light_filename = "raw-data/26-04-10-light.CSV"
+    dark_filename = "raw-data/2026-04-21-dark.CSV"
+    light_filename = "raw-data/2026-04-21-light.CSV"
     
-    reps_per_construct = 12
+    reps_per_construct = 8
     
-    dark = restructure_csv_2(dark_filename, construct_names, concs, reps_per_construct, plate="dark")
-    light = restructure_csv_2(light_filename, construct_names, concs, reps_per_construct, plate="light")
+    dark = restructure_csv_3(dark_filename, construct_names, concs, reps_per_construct, plate="dark")
+    # dark.loc[(dark["plate"] == "dark") & (dark["od600"] > 0.1), "od600"] *= 8
+    
+    light = restructure_csv_3(light_filename, construct_names, concs, reps_per_construct, plate="light")
     
     combined = pd.concat([dark, light], ignore_index=True)
-    combined.to_csv("data/restructured-OD600-26-04-10.csv", index=False)
+    combined.to_csv("data/restructured-OD600-26-04-21.csv", index=False)
     
     # combined = restructure_csv_2("raw-data/09-04-26-od600-8fold-dilution-both-long.csv", construct_names, concs, reps_per_construct, light_condition="light")
     

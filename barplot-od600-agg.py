@@ -30,12 +30,14 @@ construct_names = [
     "Empty Vector Control",
     "Pore Only Control",
     "ICR229+195",
-
+    "ICR213+192",
+    "Nterminal Control",
+    "IL6 Control",
 ]
 
-filename = "26-04-05-series-repeat-restructured.csv"
+filename = "restructured-OD600-26-04-21"
 
-df = pd.read_csv(f"data/{filename}")
+df = pd.read_csv(f"data/{filename}.csv")
 
 # Ensure consistent construct order
 df["construct"] = pd.Categorical(
@@ -45,7 +47,19 @@ df["construct"] = pd.Categorical(
 )
 
 # Ensure concentration order
-conc_order = ["1", "1/2", "1/4", "1/8", "1/16", "1/32", "1/64", "1/128", "1/256", "1/512", "1/1024", "0"]
+# conc_order = ["1", "1/2", "1/4", "1/8", "1/16", "1/32", "1/64", "1/128", "1/256", "1/512", "1/1024", "0"]
+    
+conc_order = [
+        "1/4",
+        "1/8",
+        "1/12",
+        "1/16",
+        "1/24",
+        "1/32",
+        "1/48",
+        "1/64",
+    ]
+    
 
 if "conc" not in df.columns:
     block_size = 8
@@ -129,55 +143,55 @@ def plot_od600(ax, sub_df, construct_name):
                 zorder=3,
             )
 
-    # ---- Significance: dark vs light at each concentration ----
-    have_both = ("dark" in mean_p.columns) and ("light" in mean_p.columns)
-    if have_both:
-        ymax = np.nanmax((mean_p + sd_p).to_numpy())
-        if np.isfinite(ymax):
-            global_star_y = ymax * 1.15
+    # # ---- Significance: dark vs light at each concentration ----
+    # have_both = ("dark" in mean_p.columns) and ("light" in mean_p.columns)
+    # if have_both:
+    #     ymax = np.nanmax((mean_p + sd_p).to_numpy())
+    #     if np.isfinite(ymax):
+    #         global_star_y = ymax * 1.15
 
-            for gi, conc in enumerate(concs):
-                vals_dark = sub_df[
-                    (sub_df["plate"] == "dark") &
-                    (sub_df["conc"] == conc)
-                ]["od600"].dropna().values
+    #         for gi, conc in enumerate(concs):
+    #             vals_dark = sub_df[
+    #                 (sub_df["plate"] == "dark") &
+    #                 (sub_df["conc"] == conc)
+    #             ]["od600"].dropna().values
 
-                vals_light = sub_df[
-                    (sub_df["plate"] == "light") &
-                    (sub_df["conc"] == conc)
-                ]["od600"].dropna().values
+    #             vals_light = sub_df[
+    #                 (sub_df["plate"] == "light") &
+    #                 (sub_df["conc"] == conc)
+    #             ]["od600"].dropna().values
 
-                if len(vals_dark) == 0 or len(vals_light) == 0:
-                    continue
+    #             if len(vals_dark) == 0 or len(vals_light) == 0:
+    #                 continue
 
-                stat, p = ttest_ind(vals_dark, vals_light, equal_var=False)
-                stars = p_to_star(p)
+    #             stat, p = ttest_ind(vals_dark, vals_light, equal_var=False)
+    #             stars = p_to_star(p)
 
-                if stars == "ns":
-                    continue
+    #             if stars == "ns":
+    #                 continue
 
-                x_center = x[gi]
-                x1 = x_center - width/2
-                x2 = x_center + width/2
-                y = global_star_y
+    #             x_center = x[gi]
+    #             x1 = x_center - width/2
+    #             x2 = x_center + width/2
+    #             y = global_star_y
 
-                ax.plot(
-                    [x1, x1, x2, x2],
-                    [y * 0.98, y, y, y * 0.98],
-                    lw=1,
-                    c="black"
-                )
+    #             ax.plot(
+    #                 [x1, x1, x2, x2],
+    #                 [y * 0.98, y, y, y * 0.98],
+    #                 lw=1,
+    #                 c="black"
+    #             )
 
-                ax.text(
-                    (x1 + x2) / 2,
-                    y * 1.02,
-                    stars,
-                    ha="center",
-                    va="bottom",
-                    fontsize=11
-                )
+    #             ax.text(
+    #                 (x1 + x2) / 2,
+    #                 y * 1.02,
+    #                 stars,
+    #                 ha="center",
+    #                 va="bottom",
+    #                 fontsize=11
+    #             )
 
-            ax.set_ylim(top=global_star_y * 1.15)
+    #         ax.set_ylim(top=global_star_y * 1.15)
 
     # ---- Labels ----
     ax.set_xticks(x)
